@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>鯖江WiFiマップ - wifisabae</title>
+<meta property="og:image" content="https://code4fukui.github.io/wifisabae/ogp.jpg">
+</head>
+<body>
+
+<h1>鯖江WiFiマップ</h1>
+<div id='mapdiv'></div>
+<button id=gotohere>現在地表示</button>
+</div>
+
+<div id='credit'>
+鯖江市からCC BYのオープンデータで公開されている「<a href=https://ckan.odp.jig.jp/dataset/jp-fukui-sabae-173-odp>公衆無線LAN(福井県鯖江市) - データセット - オープンデータプラットフォーム | データカタログサイト</a>」を使って、鯖江無線LANマップを作ってみました。<br>
+<!--半透明の青い丸がだいたい電波の届く範囲を表しますが、厳密ではないので、参考までにしてください。<br>-->
+<br>
+APP: <a href='https://fukuno.jig.jp/2012/'>CC BY @taisukef 一日一創</a> (<a href=https://github.com/code4fukui/wifisabae/>src on GitHub</a>)</div>
+</div>
+		
+<script type="module">
+import { initMap, showHere, L } from "https://code4fukui.github.io/egmapjs/egmap.mjs";
+import { ODP } from "https://code4fukui.github.io/SPARQL/ODP.js";
+
+
+const map = initMap("mapdiv");
+
+const sparql = new ODP();
+const res = await sparql.query(`
+select * {
+	graph <http://data.city.sabae.lg.jp/rdf/173> {
+		?s a <http://purl.org/jrrk#PublicWIFI>;
+			<http://www.w3.org/2000/01/rdf-schema#label> ?name;
+			<http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat;
+			<http://www.w3.org/2003/01/geo/wgs84_pos#long> ?lng;
+			<http://purl.org/jrrk#openingHours> ?opening;
+			<http://odp.jig.jp/odp/1.0#coverage> ?coverage;
+			<http://odp.jig.jp/odp/1.0#hasPlugs> ?hasPlugs.
+	}
+} limit 100
+`);
+console.log(res);
+
+const data = res.results.bindings;
+
+const lls = [];
+for (const c of data) {
+	const [lat, lng] = [c.lat.value, c.lng.value];
+	const txt = [
+		c.name.value,
+		c.opening.value,
+		"SSID: sabaewifi",
+		"PW: sabae12345678",
+		"範囲: " + c.coverage.value,
+		"電源: " + c.hasPlugs.value,
+		"出展: <a href=https://www.city.sabae.fukui.jp/about_city/it_nomachi/koshumusenlan/sabaewifi.html>公衆無線LANについて 鯖江市</a>",
+	].join("<br>");
+	map.addIcon(lat, lng, txt);
+	lls.push([lat, lng]);
+
+	const circle = L.circle([lat, lng], {
+		radius: 30,
+		//color: "blue",
+		stroke: false,
+		fillColor: "blue",
+		fillOpacity: 0.3,
+	}).addTo(map);
+}
+map.fitBounds(lls);
+
+// 現在位置表示ボタン
+gotohere.onclick = () => showHere(map);
+
+</script>
+<style>
+body, div, select {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+body {
+	text-align: center;
+}
+h1 {
+	font-size: 130%;
+	margin: 0;
+	padding: .5em;
+	background-color: rgb(48, 48, 196);
+	color: white;
+}
+#main {
+	width: 100%;
+	height: 500px;
+	white-space: nowrap;
+}
+#mapdiv {
+	width: 100%;
+	height: 75vh;
+}
+button {
+	margin: .5em;
+}
+#credit {
+	margin: 1em;
+}
+a {
+	color: gray !important;
+}
+</style>
+
+</body>
+</html>
