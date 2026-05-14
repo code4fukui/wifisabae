@@ -9,7 +9,7 @@ An interactive map of public WiFi hotspots in Sabae City, Fukui, Japan. This pro
 **[Live Map: 鯖江WiFiマップ](https://code4fukui.github.io/wifisabae/)**
 
 
-![OGP Preview](https://code4fukui.github.io/wifisabae/ogp.jpg)
+![OGP Preview](https://github.com/code4fukui/wifisabae)
 
 
 ## Features

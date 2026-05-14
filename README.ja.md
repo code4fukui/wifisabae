@@ -6,7 +6,7 @@
 
 **[ライブマップ: 鯖江WiFiマップ](https://code4fukui.github.io/wifisabae/)**
 
-![OGPプレビュー](https://code4fukui.github.io/wifisabae/ogp.jpg)
+![OGPプレビュー](https://github.com/code4fukui/wifisabae)
 
 ## 機能
 
